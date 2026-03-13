@@ -3150,13 +3150,19 @@ fn test_check_checkfile_with_io_error() {
     "ac"
 )]
 fn test_shake128(#[case] args: &[&str], #[case] expected: &str) {
+    let algo_name = if args.is_empty() || args[1] == "0" {
+        "SHAKE128".to_string()
+    } else {
+        format!("SHAKE128-{}", args[1])
+    };
+
     new_ucmd!()
         .arg("-a")
         .arg("shake128")
         .args(args)
         .pipe_in("xxx")
         .succeeds()
-        .stdout_only(format!("SHAKE128 (-) = {expected}\n"));
+        .stdout_only(format!("{algo_name} (-) = {expected}\n"));
 }
 
 #[rstest]
@@ -3213,11 +3219,17 @@ fn test_shake128(#[case] args: &[&str], #[case] expected: &str) {
     "2f"
 )]
 fn test_shake256(#[case] args: &[&str], #[case] expected: &str) {
+    let algo_name = if args.is_empty() || args[1] == "0" {
+        "SHAKE256".to_string()
+    } else {
+        format!("SHAKE256-{}", args[1])
+    };
+
     new_ucmd!()
         .arg("-a")
         .arg("shake256")
         .args(args)
         .pipe_in("xxx")
         .succeeds()
-        .stdout_only(format!("SHAKE256 (-) = {expected}\n"));
+        .stdout_only(format!("{algo_name} (-) = {expected}\n"));
 }
