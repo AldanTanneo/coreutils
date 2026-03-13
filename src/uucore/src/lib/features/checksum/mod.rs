@@ -250,14 +250,15 @@ pub enum SizedAlgoKind {
     Sha3(ShaLength),
     // Note: we store Blake2b's length as BYTES.
     Blake2b(Option<usize>),
+    // Shake* length are stored in bits.
     Shake128(Option<usize>),
     Shake256(Option<usize>),
 }
 
 impl SizedAlgoKind {
-    pub fn from_unsized(kind: AlgoKind, byte_length: Option<usize>) -> UResult<Self> {
+    pub fn from_unsized(kind: AlgoKind, output_length: Option<usize>) -> UResult<Self> {
         use AlgoKind as ak;
-        match (kind, byte_length) {
+        match (kind, output_length) {
             (
                 ak::Sysv
                 | ak::Bsd
@@ -315,8 +316,10 @@ impl SizedAlgoKind {
             Sha3(len) => format!("SHA3-{}", len.as_usize()),
             Blake2b(Some(byte_len)) => format!("BLAKE2b-{}", byte_len * 8),
             Blake2b(None) => "BLAKE2b".into(),
-            Shake128(_) => "SHAKE128".into(),
-            Shake256(_) => "SHAKE256".into(),
+            Shake128(Some(bit_len)) => format!("SHAKE128-{bit_len}"),
+            Shake128(None) => "SHAKE128".into(),
+            Shake256(Some(bit_len)) => format!("SHAKE256-{bit_len}"),
+            Shake256(None) => "SHAKE256".into(),
             Sysv | Bsd | Crc | Crc32b => panic!("Should not be used for tagging"),
         }
     }
